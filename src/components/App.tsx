@@ -1,30 +1,26 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Background from "./Background";
 import Container from "./Container";
-import Header from "./Header";
+import Header, { HeaderTop } from "./Header";
+import Logo from "./Logo";
+import BookmarksButton from "./BookmarksButton";
+import SearchForm from "./SearchForm";
+import { useJobItems } from "../lib/hooks";
 
 function App() {
-  const [jobItems, setJobItems] = useState([]);
   const [searchText, setSearchText] = useState("");
-
-  useEffect(() => {
-    if (!searchText) return;
-
-    const fetchData = async () => {
-      const response = await fetch(
-        `https://bytegrad.com/course-assets/projects/rmtdev/api/data?search=${searchText}`,
-      );
-      const data = await response.json();
-      setJobItems(data.jobItems);
-    };
-    fetchData();
-  }, [searchText]);
-
+  const { jobItems, isLoading } = useJobItems(searchText);
   return (
     <>
       <Background />
-      <Header searchText={searchText} setSearchText={setSearchText} />
-      <Container jobItems={jobItems} />
+      <Header>
+        <HeaderTop>
+          <Logo />
+          <BookmarksButton />
+        </HeaderTop>
+        <SearchForm searchText={searchText} setSearchText={setSearchText} />
+      </Header>
+      <Container jobItems={jobItems} isLoading={isLoading} />
     </>
   );
 }
