@@ -5,6 +5,7 @@ import { BASE_API_URL } from "./constants";
 export function useJobItems(searchText: string) {
   const [jobItems, setJobItems] = useState<JobItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const totalNumOfResults = jobItems.length;
 
   useEffect(() => {
     if (!searchText) return;
@@ -18,7 +19,7 @@ export function useJobItems(searchText: string) {
     };
     fetchData();
   }, [searchText]);
-  return { jobItems, isLoading };
+  return { jobItems, isLoading, totalNumOfResults };
 }
 
 export function useActiveId() {
@@ -58,5 +59,17 @@ export function useJobItem(activeId: number | null) {
 
     fetchData();
   }, [activeId]);
-  return [activeJobItem, isLoading] as const;
+  return { activeJobItem, isLoading } as const;
+}
+
+export function useDebounce<T>(value: T, delay = 250): T {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const timerId = setTimeout(() => setDebouncedValue(value), delay);
+
+    return () => clearTimeout(timerId);
+  }, [value, delay]);
+
+  return debouncedValue;
 }

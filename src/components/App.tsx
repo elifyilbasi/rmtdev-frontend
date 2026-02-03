@@ -5,11 +5,13 @@ import Header, { HeaderTop } from "./Header";
 import Logo from "./Logo";
 import BookmarksButton from "./BookmarksButton";
 import SearchForm from "./SearchForm";
-import { useJobItems } from "../lib/hooks";
+import { useDebounce, useJobItems } from "../lib/hooks";
 
 function App() {
   const [searchText, setSearchText] = useState("");
-  const { jobItems, isLoading } = useJobItems(searchText);
+  const debouncedSearchText = useDebounce(searchText);
+  const { jobItems, isLoading, totalNumOfResults } =
+    useJobItems(debouncedSearchText);
 
   return (
     <>
@@ -21,7 +23,11 @@ function App() {
         </HeaderTop>
         <SearchForm searchText={searchText} setSearchText={setSearchText} />
       </Header>
-      <Container jobItems={jobItems} isLoading={isLoading} />
+      <Container
+        jobItems={jobItems}
+        isLoading={isLoading}
+        totalNumOfResults={totalNumOfResults}
+      />
     </>
   );
 }
