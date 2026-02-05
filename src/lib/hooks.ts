@@ -51,7 +51,7 @@ export function useJobItem(activeId: number | null) {
     }
   }, [isError, error]);
 
-  return { activeJobItem: data?.jobItem, isLoading };
+  return { activeJobItem: data?.jobItem, isLoading } as const;
 }
 
 export function useJobItems(searchText: string) {
@@ -64,7 +64,7 @@ export function useJobItems(searchText: string) {
     retry: false,
   });
 
-  return { jobItems: data, isLoading };
+  return { jobItems: data, isLoading } as const;
 }
 
 export function useActiveId() {
