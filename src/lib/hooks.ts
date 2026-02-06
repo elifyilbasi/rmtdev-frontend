@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { JobItem, JobItemExpanded } from "./types";
 import { BASE_API_URL } from "./constants";
+import toast from "react-hot-toast";
 
 type JobItemApiResponse = {
   public: boolean;
@@ -17,7 +18,12 @@ type JobItemsApiResponse = {
 const fetchJobItem = async (activeId: number): Promise<JobItemApiResponse> => {
   const res = await fetch(`${BASE_API_URL}/${activeId}`);
   if (!res.ok) {
-    throw new Error();
+    let message = `Request failed ${res.status}`;
+    try {
+      const data = await res.json();
+      message = data?.description || data?.message || message;
+    } catch {}
+    throw new Error(message);
   }
   const data = await res.json();
   return data;
@@ -28,10 +34,15 @@ const fetchJobItems = async (
 ): Promise<JobItemsApiResponse> => {
   const res = await fetch(`${BASE_API_URL}?search=${searchText}`);
   if (!res.ok) {
-    throw new Error();
+    let message = `Request failed ${res.status}`;
+    try {
+      const data = await res.json();
+      message = data?.description || data?.message || message;
+    } catch {}
+    throw new Error(message);
   }
   const data = await res.json();
-  return data.jobItems;
+  return data;
 };
 
 export function useJobItem(activeId: number | null) {
@@ -42,12 +53,15 @@ export function useJobItem(activeId: number | null) {
     refetchOnWindowFocus: false,
     retry: false,
 
-    queryFn: () => (activeId ? fetchJobItem(activeId) : null),
+    queryFn: () => {
+      if (activeId == null) throw new Error("activeId is required");
+      return fetchJobItem(activeId);
+    },
   });
 
   useEffect(() => {
     if (isError) {
-      console.error(error);
+      toast.error(error.message);
     }
   }, [isError, error]);
 
@@ -55,7 +69,7 @@ export function useJobItem(activeId: number | null) {
 }
 
 export function useJobItems(searchText: string) {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ["job-items", searchText],
     queryFn: () => fetchJobItems(searchText),
     enabled: Boolean(searchText),
@@ -64,7 +78,13 @@ export function useJobItems(searchText: string) {
     retry: false,
   });
 
-  return { jobItems: data, isLoading } as const;
+  useEffect(() => {
+    if (isError) {
+      toast.error(error.message);
+    }
+  }, [isError, error]);
+
+  return { jobItems: data?.jobItems, isLoading } as const;
 }
 
 export function useActiveId() {
