@@ -8,6 +8,8 @@ export default function Container({
   onPageChange,
   currentPage,
   totalNumOfPages,
+  handleChangeSortBy,
+  sortBy,
 }) {
   return (
     <div className="container">
@@ -18,6 +20,8 @@ export default function Container({
         onPageChange={onPageChange}
         currentPage={currentPage}
         totalNumOfPages={totalNumOfPages}
+        handleChangeSortBy={handleChangeSortBy}
+        sortBy={sortBy}
       />
       <JobItemContent />
     </div>

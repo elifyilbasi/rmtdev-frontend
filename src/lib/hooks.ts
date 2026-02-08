@@ -53,10 +53,7 @@ export function useJobItem(activeId: number | null) {
     refetchOnWindowFocus: false,
     retry: false,
 
-    queryFn: () => {
-      if (activeId == null) throw new Error("activeId is required");
-      return fetchJobItem(activeId);
-    },
+    queryFn: () => (activeId ? fetchJobItem(activeId) : null),
   });
 
   useEffect(() => {
@@ -115,4 +112,16 @@ export function useDebounce<T>(value: T, delay = 250): T {
   }, [value, delay]);
 
   return debouncedValue;
+}
+
+export function useLocalStorage(key: string, initialValue) {
+  const [value, setValue] = useState(() =>
+    JSON.parse(localStorage.getItem(key) || JSON.stringify(initialValue)),
+  );
+
+  useEffect(() => {
+    localStorage.setItem(key, JSON.stringify(value));
+  }, [value, key]);
+
+  return [value, setValue] as const;
 }
