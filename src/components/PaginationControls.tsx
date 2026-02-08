@@ -1,29 +1,22 @@
 import { ArrowLeftIcon, ArrowRightIcon } from "@radix-ui/react-icons";
 import { PageDirection } from "../lib/types";
+import { useJobItemsContext } from "../contexts/JobItemsContextProvider";
 
-type PaginationControlsProps = {
-  onChangePage: (direction: PageDirection) => void;
-  currentPage: number;
-  totalNumOfPages: number;
-};
-
-export default function PaginationControls({
-  onChangePage,
-  currentPage,
-  totalNumOfPages,
-}: PaginationControlsProps) {
+export default function PaginationControls() {
+  const { currentPage, totalNumOfPages, handleChangePage } =
+    useJobItemsContext();
   return (
     <section className="pagination">
       {currentPage > 1 && (
         <PaginationButton
-          onChangePage={() => onChangePage("previous")}
+          onChangePage={() => handleChangePage("previous")}
           direction="previous"
           currentPage={currentPage}
         />
       )}
       {currentPage < totalNumOfPages && (
         <PaginationButton
-          onChangePage={() => onChangePage("next")}
+          onChangePage={() => handleChangePage("next")}
           direction="next"
           currentPage={currentPage}
         />

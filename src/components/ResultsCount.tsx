@@ -1,7 +1,7 @@
-type ResultCountsProp = {
-  totalNumOfResults: number;
-};
-export default function ResultsCount({ totalNumOfResults }: ResultCountsProp) {
+import { useJobItemsContext } from "../contexts/JobItemsContextProvider";
+
+export default function ResultsCount() {
+  const { totalNumOfResults } = useJobItemsContext();
   return (
     <p className="count">
       <span className="u-bold">{totalNumOfResults}</span> results
