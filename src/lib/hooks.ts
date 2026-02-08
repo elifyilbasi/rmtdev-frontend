@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQueries, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { JobItem, JobItemExpanded } from "./types";
 import { BASE_API_URL } from "./constants";
@@ -65,7 +65,7 @@ export function useJobItem(activeId: number | null) {
   return { activeJobItem: data?.jobItem, isLoading } as const;
 }
 
-export function useJobItems(searchText: string) {
+export function useSearchQuery(searchText: string) {
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["job-items", searchText],
     queryFn: () => fetchJobItems(searchText),
@@ -82,6 +82,25 @@ export function useJobItems(searchText: string) {
   }, [isError, error]);
 
   return { jobItems: data?.jobItems, isLoading } as const;
+}
+
+export function useJobItems(ids: number[]) {
+  const result = useQueries({
+    queries: ids.map((id) => ({
+      queryKey: ["job-item", id],
+      queryFn: () => fetchJobItem(id),
+      staleTime: 1000 * 60 * 60,
+      refetchOnWindowFocus: false,
+      retry: false,
+      enabled: Boolean(id),
+    })),
+  });
+  const jobItems = result
+    .map((item) => item.data?.jobItem)
+    .filter((jobItem) => jobItem !== undefined);
+
+  const isLoading = result.some((item) => item.isLoading);
+  return { jobItems, isLoading };
 }
 
 export function useActiveId() {
@@ -114,7 +133,10 @@ export function useDebounce<T>(value: T, delay = 250): T {
   return debouncedValue;
 }
 
-export function useLocalStorage(key: string, initialValue) {
+export function useLocalStorage<T>(
+  key: string,
+  initialValue: T,
+): [T, React.Dispatch<React.SetStateAction<T>>] {
   const [value, setValue] = useState(() =>
     JSON.parse(localStorage.getItem(key) || JSON.stringify(initialValue)),
   );

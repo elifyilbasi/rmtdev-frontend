@@ -6,14 +6,14 @@ import Header, { HeaderTop } from "./Header";
 import Logo from "./Logo";
 import BookmarksButton from "./BookmarksButton";
 import SearchForm from "./SearchForm";
-import { useDebounce, useJobItems } from "../lib/hooks";
+import { useDebounce, useSearchQuery } from "../lib/hooks";
 import { RESULTS_PER_PAGE } from "../lib/constants";
 import { PageDirection, SortBy } from "../lib/types";
 
 function App() {
   const [searchText, setSearchText] = useState("");
   const debouncedSearchText = useDebounce(searchText);
-  const { jobItems, isLoading } = useJobItems(debouncedSearchText);
+  const { jobItems, isLoading } = useSearchQuery(debouncedSearchText);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState<SortBy>("relevant");
 
